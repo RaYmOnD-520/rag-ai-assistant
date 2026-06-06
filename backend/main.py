@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import tempfile
 import os
+import re
 from ingest import ingest_document
 from query import query_document
 
@@ -51,7 +52,7 @@ async def upload_document(file: UploadFile = File(...)):
             tmp_path = tmp.name
 
         # Use filename (without .pdf) as collection name
-        collection_name = file.filename.replace(".pdf", "").replace(" ", "_").lower()
+        collection_name = re.sub(r'[^a-z0-9_]', '', file.filename.replace(".pdf", "").replace(" ", "_").lower())
 
         # Run ingest
         chunk_count = ingest_document(tmp_path, collection_name)
