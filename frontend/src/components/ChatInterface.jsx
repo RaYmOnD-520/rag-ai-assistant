@@ -30,11 +30,6 @@ const ChatInterface = ({ collectionName, messages }) => {
       return;
     }
 
-    if (!collectionName) {
-      setError('No document selected. Please upload a document first.');
-      return;
-    }
-
     const userMessage = {
       id: Date.now(),
       text: inputMessage.trim(),
@@ -102,85 +97,104 @@ const ChatInterface = ({ collectionName, messages }) => {
     const isError = message.sender === 'error';
 
     return (
-      <div
-        key={message.id}
-        className={`flex mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}
-      >
-        <div
-          className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-            isUser
-              ? 'bg-blue-500 text-white rounded-br-none'
-              : isError
-              ? 'bg-red-100 text-red-700 border border-red-300 rounded-bl-none'
-              : 'bg-gray-700 text-white rounded-bl-none'
-          }`}
-        >
-          <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-          {message.sources && message.sources.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-gray-600">
-              <p className="text-xs opacity-75">Sources:</p>
-              <ul className="text-xs opacity-75 mt-1">
-                {message.sources.map((source, index) => (
-                  <li key={index} className="truncate">• {source}</li>
-                ))}
-              </ul>
+      <div key={message.id} className="w-full">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className={`flex gap-4 mb-6 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+            {/* Avatar */}
+            {!isUser && (
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z"/>
+                </svg>
+              </div>
+            )}
+
+            <div className={`flex-1 ${isUser ? 'flex justify-end' : ''}`}>
+              <div className={`${isUser ? 'max-w-2xl' : 'max-w-full'}`}>
+                <div className={`rounded-lg px-4 py-3 ${
+                  isUser
+                    ? 'bg-blue-600 text-white'
+                    : isError
+                    ? 'bg-red-500/10 text-red-300 border border-red-500/20'
+                    : 'bg-gray-800 text-gray-100'
+                }`}>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+
+                  {/* Sources */}
+                  {message.sources && message.sources.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-600">
+                      <p className="text-xs text-gray-300 mb-1">Sources:</p>
+                      <ul className="text-xs text-gray-300 space-y-1">
+                        {message.sources.map((source, index) => (
+                          <li key={index} className="truncate">• {source}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {/* Timestamp */}
+                <p className="text-xs text-gray-500 mt-1 px-1">
+                  {formatTime(message.timestamp)}
+                </p>
+              </div>
             </div>
-          )}
-          <p className={`text-xs mt-1 ${
-            isUser ? 'text-blue-100' : isError ? 'text-red-500' : 'text-gray-300'
-          }`}>
-            {formatTime(message.timestamp)}
-          </p>
+
+            {/* User Avatar */}
+            {isUser && (
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"/>
+                </svg>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
   };
 
   const renderTypingIndicator = () => (
-    <div className="flex justify-start mb-4">
-      <div className="bg-gray-700 text-white px-4 py-2 rounded-lg rounded-bl-none">
-        <div className="flex space-x-1">
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+    <div className="w-full">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="flex gap-4 mb-6">
+          {/* AI Avatar */}
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z"/>
+            </svg>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg px-4 py-3">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto bg-white rounded-lg shadow-md">
-      {/* Header */}
-      <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 rounded-t-lg">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Chat with Document
-        </h2>
-        {collectionName && (
-          <p className="text-sm text-gray-600 mt-1">
-            Document: <span className="font-medium">{collectionName}</span>
-          </p>
-        )}
-      </div>
-
+    <div className="h-full flex flex-col" style={{ height: '100vh' }}>
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-        {!collectionName ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-gray-500">
-              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
-              </svg>
-              <p>Upload a document to start chatting</p>
-            </div>
-          </div>
-        ) : currentMessages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center text-gray-500">
-              <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
-              </svg>
-              <p>Ask questions about your document</p>
-              <p className="text-sm mt-2">Try asking: "What is this document about?"</p>
+      <div className="flex-1 overflow-y-auto py-6" style={{ backgroundColor: '#1a1a1a' }}>
+        {currentMessages.length === 0 ? (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center max-w-md">
+              <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">
+                Ready to chat
+              </h3>
+              <p className="text-gray-400 text-sm">
+                Ask questions about your document. Try: "What is this document about?" or "Summarize the key points."
+              </p>
             </div>
           </div>
         ) : (
@@ -194,65 +208,69 @@ const ChatInterface = ({ collectionName, messages }) => {
 
       {/* Error message */}
       {error && (
-        <div className="px-4 py-2 bg-red-50 border-t border-red-200">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="border-t border-red-500/20 bg-red-500/10 px-4 py-3">
+          <div className="max-w-3xl mx-auto">
+            <p className="text-sm text-red-300">{error}</p>
+          </div>
         </div>
       )}
 
       {/* Input area */}
-      <div className="border-t border-gray-200 p-4 bg-gray-50 rounded-b-lg">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder={
-              collectionName
-                ? "Ask a question about your document..."
-                : "Upload a document first..."
-            }
-            disabled={isLoading || !collectionName}
-            className={`flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              (!collectionName || isLoading) ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-            }`}
-          />
-          <button
-            type="submit"
-            disabled={!inputMessage.trim() || isLoading || !collectionName}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              !inputMessage.trim() || isLoading || !collectionName
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
-            }`}
-          >
-            {isLoading ? (
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            )}
-          </button>
-        </form>
-        <p className="text-xs text-gray-500 mt-2">
-          Press Enter to send, Shift+Enter for new line
-        </p>
+      <div className="border-t border-gray-700 bg-gray-900 px-4 py-4" style={{ backgroundColor: '#1a1a1a', borderTopColor: '#2d2d2d' }}>
+        <div className="max-w-3xl mx-auto">
+          <form onSubmit={handleSubmit} className="relative">
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask a question about your document..."
+              disabled={isLoading || !collectionName}
+              className={`w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 pr-12 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors ${
+                (!collectionName || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              style={{
+                backgroundColor: '#2d2d2d',
+                borderColor: '#525252'
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!inputMessage.trim() || isLoading || !collectionName}
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-colors ${
+                !inputMessage.trim() || isLoading || !collectionName
+                  ? 'text-gray-500 cursor-not-allowed'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              {isLoading ? (
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              )}
+            </button>
+          </form>
+          <p className="text-xs text-gray-500 mt-2">
+            Press Enter to send • Shift+Enter for new line
+          </p>
+        </div>
       </div>
     </div>
   );

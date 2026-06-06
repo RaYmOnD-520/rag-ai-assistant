@@ -109,16 +109,18 @@ const FileUpload = ({ onUploadSuccess }) => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">Upload PDF Document</h2>
-
-      {/* Drag and drop area */}
+    <div className="space-y-3">
+      {/* Compact drag and drop area */}
       <div
-        className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+        className={`relative border border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${
           dragActive
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400'
+            ? 'border-blue-400 bg-blue-500/10'
+            : 'border-gray-600 hover:border-gray-500 bg-gray-800/30'
         }`}
+        style={{
+          borderColor: dragActive ? '#60a5fa' : '#525252',
+          backgroundColor: dragActive ? 'rgba(59, 130, 246, 0.1)' : 'rgba(31, 41, 55, 0.3)'
+        }}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -135,54 +137,57 @@ const FileUpload = ({ onUploadSuccess }) => {
 
         <div className="space-y-2">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-6 w-6 text-gray-400"
             stroke="currentColor"
             fill="none"
-            viewBox="0 0 48 48"
+            viewBox="0 0 24 24"
           >
             <path
-              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-              strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
             />
           </svg>
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Click to browse</span> or drag and drop
-          </p>
-          <p className="text-xs text-gray-500">PDF files only</p>
+          <div>
+            <p className="text-xs text-gray-300">
+              <span className="font-medium">Click to browse</span> or drag PDF here
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Selected file display */}
       {file && (
-        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+        <div className="p-3 bg-gray-800 rounded-lg border border-gray-600">
           <div className="flex items-center space-x-2">
-            <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="h-4 w-4 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-sm text-gray-700 truncate">{file.name}</span>
-            <span className="text-xs text-gray-500">
-              ({(file.size / 1024 / 1024).toFixed(2)} MB)
-            </span>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-white truncate">{file.name}</p>
+              <p className="text-xs text-gray-400">
+                {(file.size / 1024 / 1024).toFixed(2)} MB
+              </p>
+            </div>
           </div>
         </div>
       )}
 
       {/* Upload progress */}
       {uploading && uploadProgress > 0 && (
-        <div className="mt-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-1">
+        <div>
+          <div className="flex justify-between text-xs text-gray-300 mb-2">
             <span>Uploading...</span>
             <span>{uploadProgress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-gray-700 rounded-full h-1.5">
             <div
-              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+              className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
               style={{ width: `${uploadProgress}%` }}
             ></div>
           </div>
@@ -192,10 +197,10 @@ const FileUpload = ({ onUploadSuccess }) => {
       {/* Messages */}
       {message && (
         <div
-          className={`mt-4 p-3 rounded-lg text-sm ${
+          className={`p-2 rounded text-xs ${
             messageType === 'success'
-              ? 'bg-green-50 text-green-700 border border-green-200'
-              : 'bg-red-50 text-red-700 border border-red-200'
+              ? 'bg-green-500/20 text-green-300 border border-green-500/30'
+              : 'bg-red-500/20 text-red-300 border border-red-500/30'
           }`}
         >
           {message}
@@ -206,10 +211,10 @@ const FileUpload = ({ onUploadSuccess }) => {
       <button
         onClick={handleUpload}
         disabled={!file || uploading}
-        className={`mt-4 w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+        className={`w-full py-2 px-3 rounded text-xs font-medium transition-colors ${
           !file || uploading
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-blue-500 text-white hover:bg-blue-600'
+            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+            : 'bg-blue-600 text-white hover:bg-blue-500'
         }`}
       >
         {uploading ? 'Uploading...' : 'Upload PDF'}
