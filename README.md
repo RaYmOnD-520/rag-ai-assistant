@@ -167,4 +167,4 @@ If you encounter any issues or have questions, please open an issue on GitHub.
 
 ---
 
-*Built with ❤️ using Claude AI and modern web technologies*
+*Built with Claude AI*
