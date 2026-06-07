@@ -125,7 +125,6 @@ const FileUpload = ({ onUploadSuccess }) => {
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
-        onClick={openFileDialog}
       >
         <input
           ref={fileInputRef}
