@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const ChatInterface = ({ collectionName, messages }) => {
+const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestionClick }) => {
   const [currentMessages, setCurrentMessages] = useState(messages || []);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -183,7 +183,7 @@ const ChatInterface = ({ collectionName, messages }) => {
       <div className="flex-1 overflow-y-auto py-6" style={{ backgroundColor: '#1a1a1a' }}>
         {currentMessages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <div className="text-center max-w-md">
+            <div className="text-center max-w-md px-4">
               <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
@@ -192,9 +192,35 @@ const ChatInterface = ({ collectionName, messages }) => {
               <h3 className="text-lg font-medium text-white mb-2">
                 Ready to chat
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-sm mb-4">
                 Ask questions about your document. Try: "What is this document about?" or "Summarize the key points."
               </p>
+              {suggestions.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-center mt-4">
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => onSuggestionClick && onSuggestionClick(suggestion)}
+                      className="px-4 py-2 rounded-full text-sm border transition-colors"
+                      style={{
+                        backgroundColor: '#1e1e1e',
+                        borderColor: '#525252',
+                        color: '#d1d5db'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = '#3b82f6';
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = '#525252';
+                        e.currentTarget.style.color = '#d1d5db';
+                      }}
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ) : (
