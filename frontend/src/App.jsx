@@ -1,14 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import FileUpload from './components/FileUpload';
 import ChatInterface from './components/ChatInterface';
 
 function App() {
   const [collectionName, setCollectionName] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [fileList, setFileList] = useState([]);
+
+  const fetchFiles = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/collections');
+      const data = await response.json();
+      setFileList(data.collections);
+    } catch (error) {
+      console.error('Failed to fetch files:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFiles();
+  }, []);
 
   const handleUploadSuccess = (newCollectionName) => {
     setCollectionName(newCollectionName);
     setMessages([]); // Reset messages when new document is uploaded
+    fetchFiles();
   };
 
   return (
