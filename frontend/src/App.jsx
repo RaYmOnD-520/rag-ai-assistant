@@ -6,6 +6,7 @@ function App() {
   const [collectionName, setCollectionName] = useState(null);
   const [messages, setMessages] = useState([]);
   const [fileList, setFileList] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
 
   const fetchFiles = async () => {
     try {
@@ -21,10 +22,20 @@ function App() {
     fetchFiles();
   }, []);
 
-  const handleUploadSuccess = (newCollectionName) => {
+  const handleUploadSuccess = async (newCollectionName) => {
     setCollectionName(newCollectionName);
     setMessages([]); // Reset messages when new document is uploaded
     fetchFiles();
+
+    // Fetch suggestions for the uploaded document
+    setSuggestions([]);
+    try {
+      const response = await fetch(`http://localhost:8000/suggestions/${newCollectionName}`);
+      const data = await response.json();
+      setSuggestions(data.suggestions || []);
+    } catch (error) {
+      console.error('Failed to fetch suggestions:', error);
+    }
   };
 
   const handleDelete = async (collection_name) => {
@@ -44,6 +55,17 @@ function App() {
     } catch (error) {
       console.error('Failed to delete file:', error);
     }
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    // Add suggestion as first user message
+    const userMessage = {
+      id: Date.now(),
+      text: suggestion,
+      sender: 'user',
+      timestamp: new Date().toISOString()
+    };
+    setMessages([userMessage]);
   };
 
   return (
@@ -170,6 +192,8 @@ function App() {
           <ChatInterface
             collectionName={collectionName}
             messages={messages}
+            suggestions={suggestions}
+            onSuggestionClick={handleSuggestionClick}
           />
         )}
       </div>
