@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 const ChatInterface = ({ collectionName, messages, setMessages, suggestions = [], onSuggestionClick, exportChat }) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -113,7 +114,34 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
                     ? 'bg-red-500/10 text-red-300 border border-red-500/20'
                     : 'bg-gray-800 text-gray-100'
                 }`}>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                  {isUser || isError ? (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                  ) : (
+                    <div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none">
+                      <ReactMarkdown
+                        components={{
+                          h1: ({node, ...props}) => <h1 className="text-lg font-semibold mb-2 mt-1" {...props} />,
+                          h2: ({node, ...props}) => <h2 className="text-base font-semibold mb-2 mt-1" {...props} />,
+                          h3: ({node, ...props}) => <h3 className="text-sm font-semibold mb-1 mt-1" {...props} />,
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc ml-4 mb-2 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal ml-4 mb-2 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="mb-0.5" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+                          em: ({node, ...props}) => <em className="italic" {...props} />,
+                          code: ({node, inline, ...props}) =>
+                            inline ? (
+                              <code className="bg-gray-700 px-1 py-0.5 rounded text-xs" {...props} />
+                            ) : (
+                              <code className="block bg-gray-700 p-2 rounded text-xs my-2" {...props} />
+                            ),
+                          blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-gray-600 pl-3 italic my-2" {...props} />,
+                        }}
+                      >
+                        {message.text}
+                      </ReactMarkdown>
+                    </div>
+                  )}
 
                   {/* Sources */}
                   {message.sources && message.sources.length > 0 && (
