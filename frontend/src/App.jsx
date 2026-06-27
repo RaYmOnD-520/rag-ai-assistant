@@ -59,11 +59,51 @@ function App() {
         )}
 
         {/* Upload Section */}
-        <div className="p-4 flex-1">
+        <div className="p-4 border-b border-gray-700" style={{ borderBottomColor: '#2d2d2d' }}>
           <h3 className="text-sm font-medium text-gray-300 mb-3">
             {collectionName ? 'Upload New Document' : 'Get Started'}
           </h3>
           <FileUpload onUploadSuccess={handleUploadSuccess} />
+        </div>
+
+        {/* Documents List */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+          <div className="p-4 pb-2">
+            <h3 className="text-sm font-medium text-gray-300">Your Documents</h3>
+          </div>
+          <div className="flex-1 overflow-y-auto px-2">
+            {fileList.length === 0 ? (
+              <p className="text-xs text-gray-500 px-2 py-3">No documents uploaded yet</p>
+            ) : (
+              <div className="space-y-1">
+                {fileList.map((fileName) => (
+                  <div
+                    key={fileName}
+                    onClick={() => {
+                      setCollectionName(fileName);
+                      setMessages([]);
+                    }}
+                    className="cursor-pointer px-3 py-2 rounded text-sm overflow-hidden text-ellipsis whitespace-nowrap"
+                    style={{
+                      borderLeft: collectionName === fileName ? '3px solid #3b82f6' : '3px solid transparent',
+                      color: collectionName === fileName ? '#ffffff' : '#9ca3af',
+                      backgroundColor: 'transparent',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#1a1a1a';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
+                    title={fileName}
+                  >
+                    {fileName}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
