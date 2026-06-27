@@ -61,7 +61,7 @@ const FileUpload = ({ onUploadSuccess }) => {
     setMessage('');
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('files', file);
 
     try {
       const response = await axios.post('http://localhost:8000/upload', formData, {
@@ -81,8 +81,8 @@ const FileUpload = ({ onUploadSuccess }) => {
       setUploadProgress(100);
 
       // Call the parent callback with collection_name from response
-      if (onUploadSuccess && response.data.collection_name) {
-        onUploadSuccess(response.data.collection_name);
+      if (onUploadSuccess && response.data.results[0].collection_name) {
+        onUploadSuccess(response.data.results[0].collection_name);
       }
 
       // Reset form

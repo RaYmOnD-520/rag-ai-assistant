@@ -27,6 +27,25 @@ function App() {
     fetchFiles();
   };
 
+  const handleDelete = async (collection_name) => {
+    try {
+      await fetch(`http://localhost:8000/files/${collection_name}`, {
+        method: 'DELETE',
+      });
+
+      // Refresh the file list
+      fetchFiles();
+
+      // If the deleted file was the active one, reset state
+      if (collection_name === collectionName) {
+        setCollectionName(null);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error('Failed to delete file:', error);
+    }
+  };
+
   return (
     <div className="h-screen bg-gray-900 flex" style={{ height: '100vh', backgroundColor: '#0f0f0f' }}>
       {/* Left Sidebar - Document Management */}
@@ -83,7 +102,7 @@ function App() {
                       setCollectionName(fileName);
                       setMessages([]);
                     }}
-                    className="cursor-pointer px-3 py-2 rounded text-sm overflow-hidden text-ellipsis whitespace-nowrap"
+                    className="group cursor-pointer px-3 py-2 rounded text-sm flex items-center justify-between"
                     style={{
                       borderLeft: collectionName === fileName ? '3px solid #3b82f6' : '3px solid transparent',
                       color: collectionName === fileName ? '#ffffff' : '#9ca3af',
@@ -98,7 +117,19 @@ function App() {
                     }}
                     title={fileName}
                   >
-                    {fileName}
+                    <span className="overflow-hidden text-ellipsis whitespace-nowrap flex-1">
+                      {fileName}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(fileName);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 ml-2 text-gray-500 hover:text-red-400 transition-opacity flex-shrink-0"
+                      style={{ fontSize: '16px' }}
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))}
               </div>
