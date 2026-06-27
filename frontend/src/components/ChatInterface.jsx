@@ -81,6 +81,59 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
     }
   };
 
+  const handleSuggestionClick = async (suggestion) => {
+    if (!collectionName || isLoading) {
+      return;
+    }
+
+    const userMessage = {
+      id: Date.now(),
+      text: suggestion,
+      sender: 'user',
+      timestamp: new Date().toISOString()
+    };
+
+    // Add user message immediately
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:8000/chat', {
+        question: userMessage.text,
+        collection_name: collectionName
+      });
+
+      const aiMessage = {
+        id: Date.now() + 1,
+        text: response.data.answer,
+        sender: 'ai',
+        timestamp: new Date().toISOString(),
+        sources: response.data.sources || []
+      };
+
+      setMessages([...updatedMessages, aiMessage]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage = error.response?.data?.detail || 'Failed to get response. Please try again.';
+      setError(errorMessage);
+
+      // Add error message to chat
+      const errorChatMessage = {
+        id: Date.now() + 1,
+        text: `Error: ${errorMessage}`,
+        sender: 'error',
+        timestamp: new Date().toISOString()
+      };
+
+      setMessages([...updatedMessages, errorChatMessage]);
+    } finally {
+      setIsLoading(false);
+      inputRef.current?.focus();
+    }
+  };
+
   const formatTime = (timestamp) => {
     return new Date(timestamp).toLocaleTimeString([], {
       hour: '2-digit',
@@ -96,12 +149,10 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
       <div key={message.id} className="w-full">
         <div className="max-w-3xl mx-auto px-4">
           <div className={`flex gap-4 mb-6 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-            {/* Avatar */}
+            {/* Koda Avatar */}
             {!isUser && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z"/>
-                </svg>
+              <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-black font-semibold text-sm" style={{ backgroundColor: '#00ff41' }}>
+                K
               </div>
             )}
 
@@ -109,11 +160,11 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
               <div className={`${isUser ? 'max-w-2xl' : 'max-w-full'}`}>
                 <div className={`rounded-lg px-4 py-3 ${
                   isUser
-                    ? 'bg-blue-600 text-white'
+                    ? 'text-white'
                     : isError
                     ? 'bg-red-500/10 text-red-300 border border-red-500/20'
                     : 'bg-gray-800 text-gray-100'
-                }`}>
+                }`} style={isUser ? { backgroundColor: '#003b00' } : {}}>
                   {isUser || isError ? (
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                   ) : (
@@ -181,18 +232,16 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
     <div className="w-full">
       <div className="max-w-3xl mx-auto px-4">
         <div className="flex gap-4 mb-6">
-          {/* AI Avatar */}
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2L3 7v11a1 1 0 001 1h3a1 1 0 001-1v-4h4v4a1 1 0 001 1h3a1 1 0 001-1V7l-7-5z"/>
-            </svg>
+          {/* Koda Avatar */}
+          <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-black font-semibold text-sm" style={{ backgroundColor: '#00ff41' }}>
+            K
           </div>
 
           <div className="bg-gray-800 rounded-lg px-4 py-3">
-            <div className="flex space-x-1">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+            <div className="flex space-x-1.5">
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0s', animationDuration: '1.4s' }}></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.2s', animationDuration: '1.4s' }}></div>
+              <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.4s', animationDuration: '1.4s' }}></div>
             </div>
           </div>
         </div>
@@ -235,7 +284,7 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
                   {suggestions.map((suggestion, index) => (
                     <button
                       key={index}
-                      onClick={() => onSuggestionClick && onSuggestionClick(suggestion)}
+                      onClick={() => handleSuggestionClick(suggestion)}
                       className="px-4 py-2 rounded-full text-sm border transition-colors"
                       style={{
                         backgroundColor: '#1e1e1e',
