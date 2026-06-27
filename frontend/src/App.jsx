@@ -85,6 +85,41 @@ function App() {
     updateSession(collectionName, [userMessage]);
   };
 
+  const exportChat = () => {
+    if (!collectionName || messages.length === 0) return;
+
+    // Format header
+    const currentDate = new Date().toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    let content = `RAG AI Assistant — Chat Export\nDocument: ${collectionName}\nDate: ${currentDate}\n\n`;
+
+    // Format messages
+    messages.forEach(message => {
+      if (message.sender === 'user') {
+        content += `You: ${message.text}\n\n`;
+      } else if (message.sender === 'ai') {
+        content += `Assistant: ${message.text}\n\n`;
+      }
+    });
+
+    // Create blob and download
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${collectionName}_chat.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="h-screen bg-gray-900 flex" style={{ height: '100vh', backgroundColor: '#0f0f0f' }}>
       {/* Left Sidebar - Document Management */}
@@ -211,6 +246,7 @@ function App() {
             setMessages={(newMessages) => updateSession(collectionName, newMessages)}
             suggestions={suggestions}
             onSuggestionClick={handleSuggestionClick}
+            exportChat={exportChat}
           />
         )}
       </div>
