@@ -1,23 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestionClick }) => {
-  const [currentMessages, setCurrentMessages] = useState(messages || []);
+const ChatInterface = ({ collectionName, messages, setMessages, suggestions = [], onSuggestionClick }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Update messages when props change
-  useEffect(() => {
-    setCurrentMessages(messages || []);
-  }, [messages]);
-
   // Auto scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
-  }, [currentMessages, isLoading]);
+  }, [messages, isLoading]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -38,7 +32,8 @@ const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestio
     };
 
     // Add user message immediately
-    setCurrentMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputMessage('');
     setError('');
     setIsLoading(true);
@@ -57,7 +52,7 @@ const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestio
         sources: response.data.sources || []
       };
 
-      setCurrentMessages(prev => [...prev, aiMessage]);
+      setMessages([...updatedMessages, aiMessage]);
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage = error.response?.data?.detail || 'Failed to get response. Please try again.';
@@ -71,7 +66,7 @@ const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestio
         timestamp: new Date().toISOString()
       };
 
-      setCurrentMessages(prev => [...prev, errorChatMessage]);
+      setMessages([...updatedMessages, errorChatMessage]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
@@ -181,7 +176,7 @@ const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestio
     <div className="h-full flex flex-col" style={{ height: '100vh' }}>
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto py-6" style={{ backgroundColor: '#1a1a1a' }}>
-        {currentMessages.length === 0 ? (
+        {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center max-w-md px-4">
               <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -225,7 +220,7 @@ const ChatInterface = ({ collectionName, messages, suggestions = [], onSuggestio
           </div>
         ) : (
           <>
-            {currentMessages.map(renderMessage)}
+            {messages.map(renderMessage)}
             {isLoading && renderTypingIndicator()}
             <div ref={messagesEndRef} />
           </>

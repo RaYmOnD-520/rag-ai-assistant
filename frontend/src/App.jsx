@@ -4,9 +4,20 @@ import ChatInterface from './components/ChatInterface';
 
 function App() {
   const [collectionName, setCollectionName] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [chatSessions, setChatSessions] = useState({});
   const [fileList, setFileList] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+
+  // Derive current messages from chatSessions
+  const messages = chatSessions[collectionName] || [];
+
+  // Helper function to update a specific collection's session
+  const updateSession = (collectionName, newMessages) => {
+    setChatSessions(prev => ({
+      ...prev,
+      [collectionName]: newMessages
+    }));
+  };
 
   const fetchFiles = async () => {
     try {
@@ -24,7 +35,7 @@ function App() {
 
   const handleUploadSuccess = async (newCollectionName) => {
     setCollectionName(newCollectionName);
-    setMessages([]); // Reset messages when new document is uploaded
+    // Keep existing session if it exists for this collection
     fetchFiles();
 
     // Fetch suggestions for the uploaded document
@@ -50,22 +61,28 @@ function App() {
       // If the deleted file was the active one, reset state
       if (collection_name === collectionName) {
         setCollectionName(null);
-        setMessages([]);
       }
+
+      // Remove the session from chatSessions
+      setChatSessions(prev => {
+        const updated = { ...prev };
+        delete updated[collection_name];
+        return updated;
+      });
     } catch (error) {
       console.error('Failed to delete file:', error);
     }
   };
 
   const handleSuggestionClick = (suggestion) => {
-    // Add suggestion as first user message
+    // Add suggestion as first user message to the current document's session
     const userMessage = {
       id: Date.now(),
       text: suggestion,
       sender: 'user',
       timestamp: new Date().toISOString()
     };
-    setMessages([userMessage]);
+    updateSession(collectionName, [userMessage]);
   };
 
   return (
@@ -122,7 +139,6 @@ function App() {
                     key={fileName}
                     onClick={() => {
                       setCollectionName(fileName);
-                      setMessages([]);
                     }}
                     className="group cursor-pointer px-3 py-2 rounded text-sm flex items-center justify-between"
                     style={{
@@ -192,6 +208,7 @@ function App() {
           <ChatInterface
             collectionName={collectionName}
             messages={messages}
+            setMessages={(newMessages) => updateSession(collectionName, newMessages)}
             suggestions={suggestions}
             onSuggestionClick={handleSuggestionClick}
           />
