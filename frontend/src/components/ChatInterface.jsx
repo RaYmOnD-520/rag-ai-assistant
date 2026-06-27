@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-const ChatInterface = ({ collectionName, messages, setMessages, suggestions = [], onSuggestionClick }) => {
+const ChatInterface = ({ collectionName, messages, setMessages, suggestions = [], onSuggestionClick, exportChat }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -174,6 +174,18 @@ const ChatInterface = ({ collectionName, messages, setMessages, suggestions = []
 
   return (
     <div className="h-full flex flex-col" style={{ height: '100vh' }}>
+      {/* Chat header with export button */}
+      {messages.length > 0 && (
+        <div className="border-b border-gray-700 px-4 py-3 flex justify-end" style={{ borderBottomColor: '#2d2d2d', backgroundColor: '#1a1a1a' }}>
+          <button
+            onClick={exportChat}
+            className="border border-gray-600 text-gray-400 hover:border-gray-400 hover:text-white text-xs px-3 py-1 rounded transition-colors"
+          >
+            Export Chat
+          </button>
+        </div>
+      )}
+
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto py-6" style={{ backgroundColor: '#1a1a1a' }}>
         {messages.length === 0 ? (
