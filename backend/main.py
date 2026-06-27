@@ -191,16 +191,16 @@ def get_suggestions(collection_name: str):
         client = chromadb.PersistentClient(path="./chroma_db")
         collection = client.get_or_create_collection(name=collection_name)
 
-        # Get all chunks from the collection
-        all_chunks = collection.get()
+        # Get sample chunks from the collection (limit to avoid memory issues)
+        result = collection.get(limit=10)
 
-        if not all_chunks['documents']:
+        if not result or not result.get('documents') or len(result['documents']) == 0:
             raise HTTPException(status_code=404, detail="Collection is empty or does not exist")
 
-        # Select 3 random chunks
-        chunk_count = len(all_chunks['documents'])
-        sample_size = min(3, chunk_count)
-        random_chunks = random.sample(all_chunks['documents'], sample_size)
+        # Extract documents and take up to 3 chunks
+        documents = result['documents']
+        sample_size = min(3, len(documents))
+        random_chunks = random.sample(documents, sample_size)
 
         # Combine chunks for context
         context = "\n\n".join(random_chunks)
@@ -246,5 +246,7 @@ Return ONLY a JSON array of 3 question strings, nothing else. Format: ["question
 
         return {"suggestions": suggestions[:3]}  # Ensure only 3 questions
 
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to generate suggestions: {str(e)}")
