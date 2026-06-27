@@ -134,7 +134,7 @@ function App() {
       >
         {/* Logo/Header */}
         <div className="p-4 border-b border-gray-700" style={{ borderBottomColor: '#2d2d2d' }}>
-          <h1 className="text-lg font-semibold text-white">RAG Assistant</h1>
+          <h1 className="text-lg font-semibold text-white">KoDa</h1>
           <p className="text-xs text-gray-400 mt-1">Chat with your documents</p>
         </div>
 
